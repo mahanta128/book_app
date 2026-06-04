@@ -2,8 +2,6 @@
 //  Book_AppApp.swift
 //  Book_App
 //
-//  Created by Abhijit Mahanta on 6/4/26.
-//
 
 import SwiftUI
 
@@ -11,7 +9,7 @@ import SwiftUI
 struct Book_AppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootTabView()
         }
     }
 }
