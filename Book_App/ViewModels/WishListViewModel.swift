@@ -17,19 +17,14 @@ final class WishListViewModel {
     }
 
     func loadOnAppear(isDemo: Bool) async {
-        if isDemo, snapshot == nil {
-            loadDemo()
-            return
-        }
-        await refresh()
+        await syncRunMode(isDemo: isDemo)
     }
 
     func syncRunMode(isDemo: Bool) async {
+        errorMessage = nil
         if isDemo {
             loadDemo()
-            return
-        }
-        if snapshot?.source == .demoFixture {
+        } else {
             await refresh()
         }
     }

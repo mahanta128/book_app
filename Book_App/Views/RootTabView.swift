@@ -1,20 +1,20 @@
 import SwiftUI
 
 struct RootTabView: View {
-    @State private var appMode = AppModeController()
-    @State private var wishListVM = WishListViewModel()
+    @State private var appMode: AppModeController
+    @State private var wishListVM: WishListViewModel
     @State private var scanVM: ShelfScanViewModel
 
     init() {
+        let modeController = AppModeController()
+        let isDemo = modeController.isDemoMode
+
+        _appMode = State(initialValue: modeController)
+        _wishListVM = State(initialValue: WishListViewModel())
         _scanVM = State(
             initialValue: ShelfScanViewModel(
-                demoMode: false,
-                wishListProvider: {
-                    if let snapshot = try? await AppDependencies.makeWishListService().loadSnapshot() {
-                        return snapshot.items
-                    }
-                    return DemoWishListFixture.snapshot().items
-                }
+                demoMode: isDemo,
+                wishListProvider: Self.wishListItems
             )
         )
     }
@@ -32,12 +32,22 @@ struct RootTabView: View {
                 }
         }
         .task {
-            await wishListVM.loadOnAppear(isDemo: appMode.isDemoMode)
-            scanVM.syncRunMode(isDemo: appMode.isDemoMode)
+            await applyRunMode(isDemo: appMode.isDemoMode)
         }
         .onChange(of: appMode.mode) { _, _ in
-            scanVM.syncRunMode(isDemo: appMode.isDemoMode)
-            Task { await wishListVM.syncRunMode(isDemo: appMode.isDemoMode) }
+            Task { await applyRunMode(isDemo: appMode.isDemoMode) }
         }
+    }
+
+    private func applyRunMode(isDemo: Bool) async {
+        scanVM.syncRunMode(isDemo: isDemo)
+        await wishListVM.syncRunMode(isDemo: isDemo)
+    }
+
+    private static func wishListItems() async throws -> [WishListItem] {
+        if let snapshot = try await AppDependencies.makeWishListService().loadSnapshot() {
+            return snapshot.items
+        }
+        return []
     }
 }

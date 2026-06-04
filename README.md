@@ -13,8 +13,8 @@ Photograph bookshelves → recognize spines → compare to wish list → surface
 1. Open `Book_App.xcodeproj` in Xcode.
 2. Select an iPhone simulator or device.
 3. **Product → Run** (⌘R).
-4. **Live** (default): pick a shelf photo in **Scan**, or import a real wish list. Uses Vision OCR + Open Library.
-5. **Demo**: switch the **Live / Demo** picker at the top of either tab for offline fixtures and **Run demo scan** (no photo required).
+4. **Live** (default in Simulator): use the segmented **Live / Demo** control at the top of **Scan** or **Wish list**. Pick a shelf photo and tap **Scan shelf**, or import a real wish list. Uses on-device Vision OCR + Open Library (network required).
+5. **Demo**: switch the picker to **Demo** for offline sample data and **Run demo scan** (no photo required). Switch back to **Live** to reload your saved wish list from disk.
 
 ### Scheme overrides (optional)
 

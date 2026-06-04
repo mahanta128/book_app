@@ -35,6 +35,10 @@ final class ShelfScanViewModel {
         recognitionService = AppDependencies.makeRecognitionService(demoMode: isDemo)
         lastResult = nil
         errorMessage = nil
+        isProcessing = false
+        #if canImport(UIKit)
+        selectedImage = nil
+        #endif
     }
 
     func processSelectedImage() async {
