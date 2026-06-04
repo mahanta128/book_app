@@ -16,12 +16,22 @@ final class WishListViewModel {
         self.service = service
     }
 
-    func loadOnAppear() async {
-        if AppDependencies.useDemoMode, snapshot == nil {
-            snapshot = DemoWishListFixture.snapshot()
+    func loadOnAppear(isDemo: Bool) async {
+        if isDemo, snapshot == nil {
+            loadDemo()
             return
         }
         await refresh()
+    }
+
+    func syncRunMode(isDemo: Bool) async {
+        if isDemo {
+            loadDemo()
+            return
+        }
+        if snapshot?.source == .demoFixture {
+            await refresh()
+        }
     }
 
     func refresh() async {

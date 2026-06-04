@@ -5,6 +5,7 @@ import UIKit
 
 struct ScanView: View {
     @Bindable var viewModel: ShelfScanViewModel
+    @Bindable var appMode: AppModeController
     @State private var showCamera = false
     @State private var showLibrary = false
 
@@ -20,6 +21,8 @@ struct ScanView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    RunModePicker(appMode: appMode)
+
                     #if canImport(UIKit)
                     if let image = viewModel.selectedImage {
                         Image(uiImage: image)
@@ -45,11 +48,15 @@ struct ScanView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(!canScanPhoto || viewModel.isProcessing)
 
-                    if AppDependencies.useDemoMode {
+                    if appMode.isDemoMode {
                         Button("Run demo scan (no photo)") {
                             Task { await viewModel.runDemoScan() }
                         }
                         .buttonStyle(.bordered)
+                    } else {
+                        Text("Live mode uses real OCR and Open Library. Pick a shelf photo above, or switch to Demo for an offline walkthrough.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
 
                     if viewModel.isProcessing {

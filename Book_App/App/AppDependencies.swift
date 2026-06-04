@@ -2,24 +2,16 @@ import Foundation
 
 /// Composition root — swap stubs for production implementations here.
 enum AppDependencies {
-    static let useDemoMode: Bool = {
-        #if targetEnvironment(simulator)
-        return ProcessInfo.processInfo.environment["BOOK_APP_LIVE"] != "1"
-        #else
-        return false
-        #endif
-    }()
-
-    static func makeMetadataService() -> any BookMetadataServicing {
-        if useDemoMode {
+    static func makeMetadataService(demoMode: Bool) -> any BookMetadataServicing {
+        if demoMode {
             StubBookMetadataService()
         } else {
             OpenLibraryMetadataService(useNetwork: true)
         }
     }
 
-    static func makeRecognitionService() -> any BookRecognitionServicing {
-        VisionBookRecognitionService(metadataService: makeMetadataService())
+    static func makeRecognitionService(demoMode: Bool) -> any BookRecognitionServicing {
+        VisionBookRecognitionService(metadataService: makeMetadataService(demoMode: demoMode))
     }
 
     static func makeWishListService() -> any WishListServicing {

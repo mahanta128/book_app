@@ -15,18 +15,26 @@ final class ShelfScanViewModel {
     var selectedImage: UIImage?
     #endif
 
-    private let recognitionService: any BookRecognitionServicing
+    private var recognitionService: any BookRecognitionServicing
     private let missingService: any MissingAnalysisServicing
     private let wishListProvider: () async throws -> [WishListItem]
 
     init(
-        recognitionService: any BookRecognitionServicing = AppDependencies.makeRecognitionService(),
+        demoMode: Bool = false,
+        recognitionService: (any BookRecognitionServicing)? = nil,
         missingService: any MissingAnalysisServicing = AppDependencies.makeMissingAnalysisService(),
         wishListProvider: @escaping () async throws -> [WishListItem]
     ) {
         self.recognitionService = recognitionService
+            ?? AppDependencies.makeRecognitionService(demoMode: demoMode)
         self.missingService = missingService
         self.wishListProvider = wishListProvider
+    }
+
+    func syncRunMode(isDemo: Bool) {
+        recognitionService = AppDependencies.makeRecognitionService(demoMode: isDemo)
+        lastResult = nil
+        errorMessage = nil
     }
 
     func processSelectedImage() async {

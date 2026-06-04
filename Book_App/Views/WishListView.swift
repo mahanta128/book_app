@@ -2,14 +2,20 @@ import SwiftUI
 
 struct WishListImportView: View {
     @Bindable var viewModel: WishListViewModel
+    @Bindable var appMode: AppModeController
 
     var body: some View {
         NavigationStack {
             Form {
-                if AppDependencies.useDemoMode {
-                    Section("Demo") {
-                        Text("Simulator uses demo data by default. Set environment variable BOOK_APP_LIVE=1 for live Open Library + network.")
+                Section("Run mode") {
+                    RunModePicker(appMode: appMode)
+                }
+
+                if appMode.isDemoMode {
+                    Section("Demo wish list") {
+                        Text("Demo mode loads sample titles (Naruto vol. 3, Sandman, DDIA) for testing missing-book logic offline.")
                             .font(.caption)
+                            .foregroundStyle(.secondary)
                         Button("Reload demo wish list") {
                             viewModel.loadDemo()
                         }
@@ -63,7 +69,7 @@ struct WishListImportView: View {
                 }
             }
             .navigationTitle("Wish list")
-            .task { await viewModel.loadOnAppear() }
+            .task { await viewModel.loadOnAppear(isDemo: appMode.isDemoMode) }
             .refreshable { await viewModel.refresh() }
         }
     }
