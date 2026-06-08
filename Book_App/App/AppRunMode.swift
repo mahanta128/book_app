@@ -15,8 +15,10 @@ enum AppRunMode: String, CaseIterable, Identifiable, Sendable {
 
     var subtitle: String {
         switch self {
-        case .live: "Vision OCR + Open Library lookup"
-        case .demo: "Offline fixtures + instant demo scan"
+        case .live:
+            "Real camera OCR, Open Library, and optional Amazon import (needs network)."
+        case .demo:
+            "Offline sample wish list and demo scan—no camera or Amazon required."
         }
     }
 }

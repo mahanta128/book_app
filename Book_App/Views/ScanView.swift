@@ -6,6 +6,7 @@ import UIKit
 struct ScanView: View {
     @Bindable var viewModel: ShelfScanViewModel
     @Bindable var appMode: AppModeController
+    var quickActionToken: Int = 0
     @State private var showCamera = false
     @State private var showLibrary = false
 
@@ -21,6 +22,10 @@ struct ScanView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    Text("Compare a shelf photo against your wish list. Load the list on the **Wish list** tab first.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
                     RunModePicker(appMode: appMode)
 
                     #if canImport(UIKit)
@@ -52,9 +57,12 @@ struct ScanView: View {
                         Button("Run demo scan (no photo)") {
                             Task { await viewModel.runDemoScan() }
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(.borderedProminent)
+                        Text("Demo scan runs offline with sample shelf data—no camera needed.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     } else {
-                        Text("Live mode uses real OCR and Open Library. Pick a shelf photo above, or switch to Demo for an offline walkthrough.")
+                        Text("Live mode uses real OCR and Open Library. Pick a shelf photo above.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -84,7 +92,25 @@ struct ScanView: View {
                 ImagePickerView(source: .photoLibrary, image: $viewModel.selectedImage)
             }
             #endif
+            .onChange(of: quickActionToken) { _, _ in
+                handleQuickScanAction()
+            }
         }
+    }
+
+    private func handleQuickScanAction() {
+        if appMode.isDemoMode {
+            Task { await viewModel.runDemoScan() }
+            return
+        }
+
+        #if canImport(UIKit)
+        if viewModel.selectedImage != nil {
+            Task { await viewModel.processSelectedImage() }
+        } else {
+            showCamera = true
+        }
+        #endif
     }
 }
 

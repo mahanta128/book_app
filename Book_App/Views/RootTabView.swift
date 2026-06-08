@@ -1,9 +1,16 @@
 import SwiftUI
 
+private enum AppTab: Hashable {
+    case scan
+    case wishList
+}
+
 struct RootTabView: View {
     @State private var appMode: AppModeController
     @State private var wishListVM: WishListViewModel
     @State private var scanVM: ShelfScanViewModel
+    @State private var selectedTab: AppTab = .scan
+    @State private var scanQuickActionToken = 0
 
     init() {
         let modeController = AppModeController()
@@ -20,16 +27,29 @@ struct RootTabView: View {
     }
 
     var body: some View {
-        TabView {
-            ScanView(viewModel: scanVM, appMode: appMode)
-                .tabItem {
-                    Label("Scan", systemImage: "camera.viewfinder")
-                }
+        TabView(selection: $selectedTab) {
+            ScanView(
+                viewModel: scanVM,
+                appMode: appMode,
+                quickActionToken: scanQuickActionToken
+            )
+            .tabItem {
+                Label("Scan", systemImage: "camera.viewfinder")
+            }
+            .tag(AppTab.scan)
 
             WishListImportView(viewModel: wishListVM, appMode: appMode)
                 .tabItem {
                     Label("Wish list", systemImage: "list.bullet")
                 }
+                .tag(AppTab.wishList)
+        }
+        .overlay(alignment: .bottomTrailing) {
+            ScanFloatingActionButton {
+                openScanFlow()
+            }
+            .padding(.trailing, 20)
+            .padding(.bottom, 72)
         }
         .task {
             await applyRunMode(isDemo: appMode.isDemoMode)
@@ -37,6 +57,11 @@ struct RootTabView: View {
         .onChange(of: appMode.mode) { _, _ in
             Task { await applyRunMode(isDemo: appMode.isDemoMode) }
         }
+    }
+
+    private func openScanFlow() {
+        selectedTab = .scan
+        scanQuickActionToken += 1
     }
 
     private func applyRunMode(isDemo: Bool) async {
