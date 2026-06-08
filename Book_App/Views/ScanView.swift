@@ -6,7 +6,6 @@ import UIKit
 struct ScanView: View {
     @Bindable var viewModel: ShelfScanViewModel
     @Bindable var appMode: AppModeController
-    var quickActionToken: Int = 0
     @State private var showCamera = false
     @State private var showLibrary = false
 
@@ -92,25 +91,7 @@ struct ScanView: View {
                 ImagePickerView(source: .photoLibrary, image: $viewModel.selectedImage)
             }
             #endif
-            .onChange(of: quickActionToken) { _, _ in
-                handleQuickScanAction()
-            }
         }
-    }
-
-    private func handleQuickScanAction() {
-        if appMode.isDemoMode {
-            Task { await viewModel.runDemoScan() }
-            return
-        }
-
-        #if canImport(UIKit)
-        if viewModel.selectedImage != nil {
-            Task { await viewModel.processSelectedImage() }
-        } else {
-            showCamera = true
-        }
-        #endif
     }
 }
 

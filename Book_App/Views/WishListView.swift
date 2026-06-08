@@ -10,7 +10,7 @@ struct WishListImportView: View {
                 Section {
                     Text("Step 1: Load your wish list here.")
                         .font(.subheadline.weight(.semibold))
-                    Text("Step 2: Tap **Scan** (bottom-right button or Scan tab) to photograph a shelf and see what's missing.")
+                    Text("Step 2: Open the **Scan** tab to photograph a shelf and see what's missing.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } header: {
